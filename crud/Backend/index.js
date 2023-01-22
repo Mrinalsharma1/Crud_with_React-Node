@@ -3,7 +3,10 @@ const express = require('express')
 const cors = require('cors');
 const conn = require('./db')
 const User = require('./models/user')
-const UserData = require('./models/userData');
+// const UserData = require('./models/userData');
+const user = require('./models/user');
+const multer = require('multer');
+const userData = require('./models/userData');
 const app = express()
 app.use(cors());
 app.use(express.json());
@@ -25,6 +28,77 @@ app.post('/addData', async (req, res) => {
   }
 })
 
+// images upload
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'E:/Crud_with_React-Node/crud/src/Image')
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+//     cb(null, uniqueSuffix + "-" + file.originalname)
+//   }
+// })
+// const upload = multer({ storage: storage })
+
+app.post('/adddetails', async (req, res) => {
+  try {
+    const getdata = req.body
+    if (!getdata) return res.status(500).send({ msg: "Data is empty" })
+    var prod = await userData.create(getdata)
+    if (!prod) {
+      res.status(500).send({ success: false, error: "internal server error" })
+    }
+    res.status(200).send({ success: true, msg: "data added successfully" })
+  } catch (error) {
+    console.log(error)
+    res.status(501).send({ success: false, error: error })
+  }
+})
+
+// delete details
+
+app.delete('/deleteuser/:id', async (req, res) => {
+  try {
+    let result = await userData.findById(req.params.id);
+    console.log(result)
+    if (!result) {
+      res.status(500).send({ success: false, msg: 'internal server error' })
+    }
+    result = await userData.findByIdAndDelete(req.params.id)
+    res.status(200).send({ success: true, msg: "data deleted successfully" })
+  } catch (error) {
+    res.status(500).send({ error, msg: 'internal server error' })
+  }
+
+})
+
+// update data
+app.put('/updateuser/:id', async (req, res) => {
+  try {
+    // console.log(req.params.id)
+    const { fname, email, phone, city, state, pin, address, role } = req.body
+    let result = await userData.findById({ _id: req.params.id })
+    // console.log(result)
+    if (!result) return res.status(500).send({ success: false, msg: 'internal server error' })
+    const newuser = {
+      fname: fname.trim(),
+      email: email.trim(),
+      phone: phone,
+      city: city.trim(),
+      state: state.trim(),
+      pin: pin,
+      address: address.trim(),
+      role: role.trim()
+    }
+    const response = await userData.findByIdAndUpdate(req.params.id, { $set: newuser }, { new: true })
+    if (!response) return res.status(500).send({ success: false, msg: "internal server error" })
+    res.status(200).send({ success: true, mag: "data Updated Successfully" })
+  } catch (error) {
+    res.status(500).send({ error: error, msg: 'internal server error' })
+    console.log(error)
+  }
+})
+
 app.post('/loginData', async (req, res) => {
   try {
     // console.log("called!!", req.body.email)
@@ -34,7 +108,7 @@ app.post('/loginData', async (req, res) => {
       const inputData = req.body;
       let query = await User.find({ email: inputData.email, password: inputData.password });
       console.log("query>>>>>>>>:", query);
-      if (Object.keys(query).length)
+      if (query[0].password === req.body.password)
         res.status(200).send({ status: "success", message: "Successfully login!" });
       else
         res.status(200).send({ status: "failed", message: "Failed to find user credentials!" })
@@ -46,6 +120,7 @@ app.post('/loginData', async (req, res) => {
   }
 })
 
+
 app.post('/userData', (req, res) => {
   try {
     if (req && req.body) {
@@ -55,6 +130,20 @@ app.post('/userData', (req, res) => {
     res.status(400).send({ err: "server error" })
   }
 })
+
+app.get('/fetchdata', async (req, res) => {
+  try {
+    const mydata = await userData.find();
+    if (!mydata) {
+      return res.status(500).send("data not founde");
+    }
+    res.send(mydata)
+  } catch (error) {
+    res.status(500).send({ error, msg: 'internal server error' })
+  }
+
+})
+
 
 // app.get('/showData', async (req, res) => {
 //   try {
