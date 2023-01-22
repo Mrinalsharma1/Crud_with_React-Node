@@ -17,14 +17,13 @@ export const Login = () => {
 
   const handleLogin = async () => {
     try {
-      // let formData = new FormData();
-      // formData.append("email", "abc@gmail.com")
-      // formData.append("passoword", "abcd");
       let response = await axios.post(`http://localhost:5000/loginData`,
         auth);
       let res = response.data;
+      console.log(res.status)
+      alert(res.message)
       if (res.status == 'success') {
-        navigate("/adddetail");
+        navigate("/home");
       }
       // return true;
       else return false;
