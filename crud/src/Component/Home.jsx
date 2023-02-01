@@ -24,6 +24,7 @@ function Home() {
     }, [])
 
 
+
     // below code for view details
     const clicked = (e) => {
         setview(e)
