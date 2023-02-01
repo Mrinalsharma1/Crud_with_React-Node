@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors');
 const conn = require('./db')
 const User = require('./models/user')
-// const UserData = require('./models/userData');
+const product = require('./models/addproduct');
 const user = require('./models/user');
 const multer = require('multer');
 const userData = require('./models/userData');
@@ -29,16 +29,39 @@ app.post('/addData', async (req, res) => {
 })
 
 // images upload
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, 'E:/Crud_with_React-Node/crud/src/Image')
-//   },
-//   filename: function (req, file, cb) {
-//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-//     cb(null, uniqueSuffix + "-" + file.originalname)
-//   }
-// })
-// const upload = multer({ storage: storage })
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'E:/Crud_with_React-Node/crud/src/Image')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + "-" + file.originalname)
+  }
+})
+const upload = multer({ storage: storage })
+
+app.use('/public', express.static('public'))
+
+app.post('/product', upload.single('pimage'), async (req, res) => {
+  try {
+    // let pimage = (req.file) ? req.file.fieldname : null;
+    console.log(req.file)
+    var prod = await product.create({
+      pimage: req.file.filename,
+      pname: req.body.pname,
+      price: req.body.price,
+      desc: req.body.desc
+    })
+    if (!prod) {
+      res.status(500).send({ success: false, error: "internal server error" })
+    }
+    res.status(200).send({ success: true, msg: "product added successfully" })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({ success: false, error: error })
+  }
+})
 
 app.post('/adddetails', async (req, res) => {
   try {

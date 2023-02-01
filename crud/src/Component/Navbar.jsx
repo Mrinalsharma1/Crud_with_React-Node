@@ -18,6 +18,12 @@ function Navbar() {
                             <li className="nav-item">
                                 <Link to="/adddetail" className="nav-link">Add Details</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link to="/addproduct" className="nav-link">Add Product</Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/viewproduct" className="nav-link">View Product</Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
