@@ -22,7 +22,7 @@ export const Login = () => {
       let res = response.data;
       console.log(res.status)
       alert(res.message)
-      if (res.status == 'success') {
+      if (res.status === 'success') {
         navigate("/home");
       }
       // return true;
