@@ -63,6 +63,20 @@ app.post('/product', upload.single('pimage'), async (req, res) => {
   }
 })
 
+app.post('/fetchproduct', async (req, res) => {
+  // res.status(200).send("hello")
+  try {
+    const productdetail = await product.find()
+    if (!productdetail) {
+      return res.status(500).send("data not founde");
+    }
+    res.send(productdetail)
+  } catch (e) {
+    console.log('error', e)
+    res.status(500).send({ status: false, error: e })
+  }
+})
+
 app.post('/adddetails', async (req, res) => {
   try {
     const getdata = req.body
